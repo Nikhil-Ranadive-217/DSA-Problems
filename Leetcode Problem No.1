@@ -1,0 +1,45 @@
+LeetCode 1: Two Sum requires Java code returning indices of two distinct elements in nums summing to target. Exactly one solution exists per constraints.
+
+Java Implementation:-
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        HashMap<Integer, Integer> seen = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            int complement = target - nums[i];
+            if (seen.containsKey(complement)) {
+                return new int[]{seen.get(complement), i};
+            }
+            seen.put(nums[i], i);
+        }
+        return new int[]{}; // Unreachable per constraints
+    }
+}
+
+This O(n) time, O(n) space solution uses HashMap for constant-time lookups.
+​
+
+Thought Process
+Brute force double loop checks pairs in O(n²), viable for n≤10^4 but inefficient. HashMap trades space for time: store index of each number seen so far, query for complement before adding current.
+Order matters: check complement first prevents self-pairing (e.g., nums[i]+nums[i]=target wrongly). Overwriting indices for duplicates fine since constraints guarantee unique solution pair.
+Java specifics: HashMap<Integer, Integer> maps value to latest index. int[] return type matches signature. No null/empty handling needed per constraints.
+​
+
+Step-by-Step Logic
+Create HashMap<Integer, Integer> seen to store number → index.
+Loop i from 0 to nums.length - 1.
+Calculate complement = target - nums[i].
+if (seen.containsKey(complement)) return {seen.get(complement), i}.
+seen.put(nums[i], i) (overwrites if duplicate).
+Return empty array (unreachable).
+​
+
+Edge Cases
+Array length 2: [3,3] target 6: i=0 stores 3→0; i=1 complement=3 found, returns.
+Duplicates mid-array: [3,2,3] target 6: First 3→0; skip 2; second 3 complement=3 finds prior index.
+Negatives/overflow: [-1,2147483647] target 2147483646: Java int handles -2^31 to 2^31-1; complement safe.
+Zero target: [0,0] returns; [1,-1] returns indices summing to 0.
+All same value: Constraints imply target=2*value, indices or similar.
+Large n=10^4: HashMap scales; no resize issues in practice.
+​
+
+​
