@@ -1,0 +1,45 @@
+LeetCode 242: Valid Anagram returns true if string t is a rearrangement of s (same characters, same frequencies). Constraints limit to lowercase English letters initially, but follow-up asks for Unicode adaptation.
+​
+#Java Implementation
+
+class Solution {
+    public boolean isAnagram(String s, String t) {
+        if (s.length() != t.length()) return false;
+        int[] count = new int[26];
+        for (int i = 0; i < s.length(); i++) {
+            count[s.charAt(i) - 'a']++;
+            count[t.charAt(i) - 'a']--;
+        }
+        for (int c : count) {
+            if (c != 0) return false;
+        }
+        return true;
+    }
+}
+O(n) time, O(1) space using fixed-size array for 26 letters.
+​
+#Thought Process
+Sorting both strings then comparing (O(n log n)) simple but suboptimal. Frequency counting optimal: same chars/freqs iff anagrams.
+Array for lowercase (char - 'a' indexes 0-25). Increment for s, decrement for t; non-zero means mismatch. Early length check optimizes.
+HashMap generalizes to Unicode (any chars), O(n) time but O(k) space where k=unique chars. Prefer array per constraints.
+​
+
+#Step-by-Step Logic
+
+If s.length() != t.length(), return false.
+Initialize int[26] count = new int[26].
+For i=0 to s.length()-1: count[s.charAt(i)-'a']++; count[t.charAt(i)-'a']--.
+Check all count[j] == 0; if any !=0, false.
+Else true.​
+
+#Unicode Follow-up: Use HashMap<Character, Integer> instead of array. Count frequencies separately or differentially; works for any chars (emojis, etc.). Space becomes O(unique chars).
+​
+​
+#Edge Cases
+Different lengths: "a", "ab" → false immediately.​
+Same length, no anagram: "rat", "car" → 'c' count negative/nonzero.​
+Identical strings: "a", "a" → true.​
+All same chars: "aaa", "aaa" → true.
+Single char mismatch: "ab", "ac" → false.
+Empty strings: Both "" → true (lengths equal, counts zero).
+Max length 5*10^4: Efficient O(n).
