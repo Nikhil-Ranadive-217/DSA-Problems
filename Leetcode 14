@@ -1,0 +1,68 @@
+LeetCode 14: Longest Common Prefix returns the longest common starting substring across all strings in strs, or "" if none. 
+
+Java solution uses efficient vertical scanning.
+​
+Java Implementation
+
+#Horizontal scan variant (intuitive)
+class Solution {
+    public String longestCommonPrefix(String[] strs) {
+        if (strs == null || strs.length == 0) return "";
+        String prefix = strs[0];
+        for (int i = 1; i < strs.length; i++) {
+            while (strs[i].indexOf(prefix) != 0) {
+                prefix = prefix.substring(0, prefix.length() - 1);
+                if (prefix.isEmpty()) return "";
+            }
+        }
+        return prefix;
+    }
+}
+
+Note:
+Horizontal scan variant (intuitive): Shrink prefix until it matches start of ALL strings. O(S) time where S=sum lengths.
+​
+​
+
+#Vertical scan alt (optimal):
+
+public String longestCommonPrefix(String[] strs) {
+    if (strs.length == 0) return "";
+    for (int i = 0; i < strs[0].length(); i++) {
+        char c = strs[0].charAt(i);
+        for (int j = 1; j < strs.length; j++) {
+            if (i == strs[j].length() || strs[j].charAt(i) != c) {
+                return strs[0].substring(0, i);
+            }
+        }
+    }
+    return strs[0];
+}
+
+#Step-by-Step Logic
+Guard: Handle null/empty strs → "".
+Candidate: prefix = strs[0].
+Validate each string: For strs[i] (i≥1):
+While prefix not at start of strs[i] (via indexOf or char check):
+Shrink prefix by 1 char.
+If empty, return "".
+Return final prefix.
+​
+​
+
+#Thought Process
+Intuition: Common prefix is min length where chars match position-by-position across ALL strings.
+Horizontal: Start with first, iteratively trim until fits all (easy debug).
+Vertical: Check column i before i+1 (early exit). Both O(S), but vertical scans less.
+Edge-first: Sorting + compare extremes O(S log n) - clever but log factor.
+Why shrink? Guarantees prefix never exceeds true common length.
+​
+
+#Edge Cases
+Empty/null array: []/null → "".
+Empty string: ["", "abc"] → "".
+Single string: ["abc"] → "abc".
+No prefix: ["dog","cat"] → "" pos 0 mismatch.
+Shortest limits: ["flow","flower"] → "flow".
+All same: ["prefix","prefix"] → "prefix".​
+Max 200×200: Linear fine.
