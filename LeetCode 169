@@ -1,0 +1,51 @@
+LeetCode 169:Given an array nums of size n, return the majority element.
+The majority element is the element that appears more than ⌊n / 2⌋ times. You may assume that the majority element always exists in the array.
+
+Example 1:
+Input: nums = [3,2,3]
+Output: 3 Majority Element finds the element appearing > ⌊n/2⌋ times in nums. Guaranteed to exist, so no validation needed.
+
+Solution:-​
+
+#Java Implementation
+
+class Solution {
+    public int majorityElement(int[] nums) {
+        int candidate = 0;
+        int count = 0;
+        // Phase 1: Find candidate
+        for (int num : nums) {
+            if (count == 0) {
+                candidate = num;
+            }
+            count += (candidate == num) ? 1 : -1;
+        }
+        // Phase 2 optional (guaranteed exists)
+        return candidate;
+    }
+}
+
+Boyer-Moore Voting Algorithm: O(n) time, O(1) space. Genius cancellation!
+​
+#Step-by-Step Logic
+Initialize: candidate = 0, count = 0.
+Scan array:
+If count == 0, set candidate = current.
+If matches candidate, count++.
+Else, count-- (cancel vote).
+Survivor: Final candidate is majority (appears >n/2).
+​
+#Thought Process
+Brute: HashMap count frequencies O(n) time/space.
+Sort: Sort + pick n/2 index O(n log n).
+Voting insight: Majority >n/2 can't be fully canceled by minorities. Pair different elements → majority remains. Count=0 resets candidate.
+Why works? Non-majors ≤n/2, so can't zero out maj's lead. No second pass needed per guarantee.
+​
+#Edge Cases:-
+n=1: [5] → 5 (count=1).
+All majority: [3,3,3] → 3.
+Majority at ends: [2,1,2] → 2; [1,3,3,3,2,3] → 3.
+Alternating: [3,2,3,2,3] → 3 (cancels 2's).
+Even n: n=4, >2 times e.g. [1,2,2,2] → 2.
+Negatives: [-1,-1,1] → -1 (int fine).
+Max n=5×10^4: Linear scales
