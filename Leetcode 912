@@ -1,0 +1,77 @@
+Leetcode 912. Sort an Array
+Given an array of integers nums, sort the array in ascending order and return it.
+
+You must solve the problem without using any built-in functions in O(nlog(n)) time complexity and with the smallest space complexity possible.
+
+Example 1:
+Input: nums = [5,2,3,1]
+Output: [1,2,3,5]
+Explanation: After sorting the array, the positions of some numbers are not changed (for example, 2 and 3), while the positions of other numbers are changed (for example, 1 and 5).
+
+Solution:-
+
+LeetCode 912: Sort an Array sorts nums ascending, no built-ins, O(n log n) time, minimal space. Heapsort best: O(n log n) time, O(1) extra space.
+​
+#Java Implementation (Heapsort)
+
+class Solution {
+    public int[] sortArray(int[] nums) {
+        int n = nums.length;
+        // Build max-heap
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            heapify(nums, n, i);
+        }
+        // Extract max repeatedly
+        for (int i = n - 1; i > 0; i--) {
+            swap(nums, 0, i);
+            heapify(nums, i, 0);
+        }
+        return nums;
+    }
+    
+    private void heapify(int[] nums, int n, int i) {
+        int largest = i;
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+        
+        if (left < n && nums[left] > nums[largest]) {
+            largest = left;
+        }
+        if (right < n && nums[right] > nums[largest]) {
+            largest = right;
+        }
+        
+        if (largest != i) {
+            swap(nums, i, largest);
+            heapify(nums, n, largest);
+        }
+    }
+    
+    private void swap(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+}
+
+Heapsort: Build max-heap O(n), extract n times O(n log n), in-place.
+​
+#Step-by-Step Logic
+Build max-heap: Heapify non-leaves (n/2-1 to 0).
+Heapify: Swap root with largest child if needed, recurse.
+Sort: Swap root (max) with end, heapify reduced heap (size--).
+Repeat until 1 element.
+​
+#Thought Process
+Requirements: O(n log n), minimal space → Heapsort (O(1) extra), Quick/Merge O(n log n) but Quick avg O(log n) space (recursion), Merge O(n).
+Heapsort: Reliable worst-case, in-place. Build-heap linear, extracts log n.
+Quicksort alt: Faster practice but recursion stack risk (skewed input).
+​
+#Edge Cases
+n=1: [5] → unchanged.
+Empty: [] → [] (heapify skips).
+Sorted: [1,2,3] → unchanged (heapify stable).
+Reverse: [3,2,1] → [1,2,3].
+Duplicates: [2,1,2] → [1,2,2].
+Negatives: [-3,-1,-2] → [-3,-2,-1].​
+Max n=5×10^4: O(n log n) ~ 10^6 ops fine.
