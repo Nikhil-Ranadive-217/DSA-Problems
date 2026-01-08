@@ -1,0 +1,63 @@
+Leetcode problem no. 347. Top K Frequent Elements
+Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order.
+
+Example 1:
+Input: nums = [1,1,1,2,2,3], k = 2
+Output: [1,2]
+
+Solution:
+LeetCode 347: Top K Frequent Elements returns k most frequent numbers from nums (any order). Optimal: HashMap + bucket sort O(n) time.
+​
+#Java Implementation (Bucket Sort)
+
+class Solution {
+    public int[] topKFrequent(int[] nums, int k) {
+        Map<Integer, Integer> freq = new HashMap<>();
+        // Count frequencies
+        for (int n : nums) {
+            freq.put(n, freq.getOrDefault(n, 0) + 1);
+        }
+        
+        // Buckets: index = freq, value = numbers
+        List<Integer>[] buckets = new List[nums.length + 1];
+        for (int i = 0; i < buckets.length; i++) {
+            buckets[i] = new ArrayList<>();
+        }
+        
+        for (Map.Entry<Integer, Integer> entry : freq.entrySet()) {
+            buckets[entry.getValue()].add(entry.getKey());
+        }
+        
+        // Collect from highest freq
+        List<Integer> result = new ArrayList<>();
+        for (int i = buckets.length - 1; i >= 0 && result.size() < k; i--) {
+            for (int num : buckets[i]) {
+                result.add(num);
+                if (result.size() == k) break;
+            }
+        }
+        
+        return result.stream().mapToInt(Integer::intValue).toArray();
+    }
+}
+
+Bucket Sort: Freq map → buckets by frequency → scan high-to-low. O(n).
+​
+#Step-by-Step Logic
+HashMap: Count each num's frequency.
+Buckets: Array of lists, buckets[freq] holds nums with that freq.
+Populate: Place each num in its freq bucket.
+Extract: From max freq bucket down, collect k nums.
+​
+#Thought Process
+Heap: HashMap + max-heap by freq O(n log n).
+Bucket genius: Freq ≤ n, so buckets[n+1]. Highest freq at end → linear scan top k. Near O(n)!
+Why works? Freq partitioning groups perfectly; no compare needed.
+​
+#Edge Cases
+k=1: [1] → [1]; all same → that num.
+k=n: All unique → all nums.
+Duplicates max: [1,1,1,...] → [1].
+Negatives: [-1,-1,1] k=1 → [-1] (HashMap handles).
+n=1: Trivial.
+Max n=10^5: O(n) fine.
