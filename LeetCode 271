@@ -1,0 +1,71 @@
+Leetcode problem no. 271. Encode and Decode Strings - Explanation
+
+Description
+Design an algorithm to encode a list of strings to a string. The encoded string is then sent over the network and is decoded back to the original list of strings.
+
+Solution:
+
+LeetCode 271: Encode and Decode Strings converts List<String> to single string (encode) and back (decode). No serialization libraries; must handle empty strings, delimiters in content.
+​
+#Java Implementation (Length Prefix)
+
+public class Codec {
+    private static final String DELIM = "#";
+    
+    // Encodes a list of strings to a single string.
+    public String encode(List<String> strs) {
+        StringBuilder sb = new StringBuilder();
+        for (String s : strs) {
+            sb.append(s.length()).append(DELIM).append(s);
+        }
+        return sb.toString();
+    }
+    
+    // Decodes a single string to a list of strings.
+    public List<String> decode(String s) {
+        List<String> result = new ArrayList<>();
+        int i = 0;
+        while (i < s.length()) {
+            // Parse length
+            int len = 0;
+            while (i < s.length() && Character.isDigit(s.charAt(i))) {
+                len = len * 10 + (s.charAt(i++) - '0');
+            }
+            // Skip delimiter
+            if (i < s.length() && s.charAt(i) == '#') i++;
+            // Extract string
+            String str = s.substring(i, i + len);
+            result.add(str);
+            i += len;
+        }
+        return result;
+    }
+}
+
+Length prefix: len#string format. "Hello" → "5#Hello"; "World" → "5#World".
+​
+#Step-by-Step Logic
+Encode:
+For each string: append length + "#" + string
+Return concatenated result
+Decode:
+Index i = 0
+While i < length:
+Read digits → len
+Skip '#'
+Extract s.substring(i, i+len)
+i += len
+
+#Thought Process
+Problem: Strings can contain ANY chars (spaces, digits, '#'). Simple delimiter fails.
+Solution: Prefix length tells exactly where string ends. 5#Hello3#Hi → unambiguous.
+Why '#': Non-digit separator. Length digits unambiguous from string content.
+Time: O(total chars), Space: O(total chars).
+​
+#Edge Cases
+Empty strings: [""] → "0#" → decodes correctly.
+Empty list: [] → "" → empty list.
+Numbers in strings: "123" → "35#123" (3 chars, not value).
+Long strings: Length up to 10^5 total chars.
+Delimiter in content: "a#b" → "3#a#b" → perfect.
+Single string: ["abc"] → "3#abc".
