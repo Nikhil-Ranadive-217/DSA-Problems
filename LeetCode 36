@@ -1,0 +1,83 @@
+Determine if a 9 x 9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
+
+Each row must contain the digits 1-9 without repetition.
+Each column must contain the digits 1-9 without repetition.
+Each of the nine 3 x 3 sub-boxes of the grid must contain the digits 1-9 without repetition.
+
+Note:
+A Sudoku board (partially filled) could be valid but is not necessarily solvable.
+Only the filled cells need to be validated according to the mentioned rules.
+
+Example 1:
+
+Input: board =
+[["5","3",".",".","7",".",".",".","."]
+,["6",".",".","1","9","5",".",".","."]
+,[".","9","8",".",".",".",".","6","."]
+,["8",".",".",".","6",".",".",".","3"]
+,["4",".",".","8",".","3",".",".","1"]
+,["7",".",".",".","2",".",".",".","6"]
+,[".","6",".",".",".",".","2","8","."]
+,[".",".",".","4","1","9",".",".","5"]
+,[".",".",".",".","8",".",".","7","9"]]
+Output: true 
+
+Solutions:
+
+LeetCode 36: Valid Sudoku validates 9x9 board checking filled cells (1-9) have no duplicates in rows, columns, 3x3 sub-boxes. Empty '.' cells ignored.[conversation_history]
+
+#Java Implementation (Single HashSet)
+
+class Solution {
+    public boolean isValidSudoku(char[][] board) {
+        Set<String> seen = new HashSet<>();
+        
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                char c = board[i][j];
+                if (c != '.') {
+                    String rowKey = i + "r" + c;
+                    String colKey = j + "c" + c;
+                    String boxKey = (i/3)*3 + (j/3) + "b" + c;
+                    
+                    if (seen.contains(rowKey) || 
+                        seen.contains(colKey) || 
+                        seen.contains(boxKey)) {
+                        return false;
+                    }
+                    seen.add(rowKey);
+                    seen.add(colKey);
+                    seen.add(boxKey);
+                }
+            }
+        }
+        return true;
+    }
+}
+
+Genius encoding: Single HashSet with prefixes uniquely identifies row/col/box conflicts.[conversation_history]
+
+#Step-by-Step Logic
+Iterate 9x9: Check each cell.
+Skip empty: if (c != '.').
+Three keys per cell:
+Row: "rowIndexrvalue" (e.g. "0r5")
+Box: "(i/3)*3 + (j/3)bvalue" (e.g. "0b5" for top-left box)
+Duplicate check: Any key exists → invalid.
+Add all three: Track seen values.
+
+#Thought Process
+Naive: 9 row sets + 9 col sets + 9 box sets = 27 HashSets (space heavy).
+Encoding genius: Single set + unique prefixes. "0r5" vs "1r5" distinguishes rows.
+Box calc: (i/3)*3 + (j/3) maps to 0-8 for 9 boxes:
+text
+0 1 2 | 3 4 5 | 6 7 8
+Time: O(81) = O(1), Space: O(1) worst case 243 entries max.
+
+#Edge Cases
+All empty: All '.' → true (no filled conflicts).
+Partially filled: Valid partial board → true.
+Single conflict: Row duplicate → false immediately.
+Box boundary: Corner cells span boxes correctly.
+Only empties filled validly: Ignores '.' perfectly.
+Full valid Sudoku: All 81 filled, no conflicts.
