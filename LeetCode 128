@@ -1,0 +1,69 @@
+Problem:-Longest Consecutive Sequence
+Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.
+
+You must write an algorithm that runs in O(n) time.
+
+Example 1:
+
+Input: nums = [100,4,200,1,3,2]
+Output: 4
+Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. Therefore its length is 4.
+
+Solution:
+
+LeetCode 128: Longest Consecutive Sequence finds longest run of consecutive integers in unsorted nums. Must be O(n) time.[conversation_history]
+
+#Java Implementation (HashSet)
+
+class Solution {
+    public int longestConsecutive(int[] nums) {
+        Set<Integer> set = new HashSet<>();
+        for (int num : nums) set.add(num);
+        
+        int maxLen = 0;
+        for (int num : nums) {
+            // Skip if not sequence start
+            if (!set.contains(num - 1)) {
+                int curr = num;
+                int len = 1;
+                // Extend right
+                while (set.contains(curr + 1)) {
+                    curr++;
+                    len++;
+                }
+                maxLen = Math.max(maxLen, len);
+            }
+        }
+        return maxLen;
+    }
+}
+
+HashSet O(n): Only extend from sequence starts. Skip numbers with num-1 present.[conversation_history]
+
+#Step-by-Step Logic
+Build HashSet: O(n) lookup.
+Find starts: Numbers where num-1 missing.
+Extend right: Count consecutive curr+1 exists.
+Track max length.
+Example trace: [100,4,200,1,3,2]
+
+text
+Set: {100,4,200,1,3,2}
+Check 100: contains(99)? No → start, len=1
+Check 4: contains(3)? Yes → skip
+Check 200: contains(199)? No → start, len=1  
+Check 1: contains(0)? No → start, extend: 2→3→4, len=4 ✓
+
+#Thought Process
+Brute O(n²): Check each num's sequence → TLE.
+Sort O(n log n): Sort + scan → too slow.
+HashSet genius: Only start from sequence beginnings! Each number visited once total (either as start or extension).
+Why O(n): Each num processed once - either sequence start OR found during extension, never both.
+
+#Edge Cases
+Empty: [] → 0
+Single: [5] → 1
+All consecutive: [1,2,3,4] → 4
+Duplicates: [1,1,2,3] → 3 (HashSet removes dups)
+No consecutives: [100,200,300] → 1
+Negatives: [-1,0,1] → 3
