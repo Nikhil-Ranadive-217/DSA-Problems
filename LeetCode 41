@@ -1,0 +1,72 @@
+Problem:- First Missing Positive
+Given an unsorted integer array nums. Return the smallest positive integer that is not present in nums.
+
+You must implement an algorithm that runs in O(n) time and uses O(1) auxiliary space.
+
+Example 1:
+Input: nums = [1,2,0]
+Output: 3
+Explanation: The numbers in the range [1,2] are all in the array.
+
+Solution:-
+First Missing Positive finds smallest missing positive integer (1,2,3...) in O(n) time, O(1) space. Array-as-hash-table technique.​
+
+#Java Implementation (In-Place Hash)
+
+class Solution {
+    public int firstMissingPositive(int[] nums) {
+        int n = nums.length;
+        
+        // Step 1: Replace non-positives with n+1
+        for (int i = 0; i < n; i++) {
+            if (nums[i] <= 0 || nums[i] > n) {
+                nums[i] = n + 1;
+            }
+        }
+        
+        // Step 2: Mark presence using negative indices
+        for (int i = 0; i < n; i++) {
+            int num = Math.abs(nums[i]);
+            if (num <= n) {
+                nums[num - 1] = -Math.abs(nums[num - 1]);
+            }
+        }
+        
+        // Step 3: Find first unmarked positive
+        for (int i = 0; i < n; i++) {
+            if (nums[i] > 0) {
+                return i + 1;
+            }
+        }
+        
+        return n + 1;
+    }
+}
+
+Array indices as hash: nums[i-1] = -i marks presence of i.
+​
+#Step-by-Step Logic
+Ignore irrelevant: Non-positives/nums>n → set n+1
+Mark presence: For num x (1≤x≤n), make nums[x-1] negative
+Scan: First nums[i] > 0 → i+1 missing
+All present: Return n+1
+Example: [3,4,-1,1]
+text
+Step1: [3,4,5,1]  (-1→5)
+Step2: Mark 3→nums[2]=-5, 4→nums[3]=-1, 1→nums[0]=-3
+     → [-3,4,-5,-1]
+Step3: nums[1]=4>0 → return 2 ✓
+
+#Thought Process
+Range: Answer between 1 and n+1 (pigeonhole)
+HashMap: O(n) space violation
+In-place genius: Use indices 0..n-1 for numbers 1..n
+Negative flag: Preserve value while marking presence
+Time: 3 passes O(n), Space: O(1)
+
+#Edge Cases
+[1]: Mark nums negative → all marked → n+1=2
+[1,2,0]: Ignore 0 → mark 1,2 → n+1=3
+[-1,-2]: All n+1 → 1 missing
+All 1..n: Return n+1
+Duplicates: [1,1,1] → mark once → 2 missing
