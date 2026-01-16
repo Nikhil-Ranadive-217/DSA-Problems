@@ -1,0 +1,56 @@
+Problem:- Reverse String
+Write a function that reverses a string. The input string is given as an array of characters s.
+
+You must do this by modifying the input array in-place with O(1) extra memory.
+
+Example 1:
+Input: s = ["h","e","l","l","o"]
+Output: ["o","l","l","e","h"]
+
+solutions:
+
+LeetCode 344: Reverse String reverses character array s in-place with O(1) extra space using two-pointer technique.[conversation_history]
+
+#Java Implementation (Two Pointers)
+
+class Solution {
+    public void reverseString(char[] s) {
+        int left = 0;
+        int right = s.length - 1;
+        
+        while (left < right) {
+            char temp = s[left];
+            s[left] = s[right];
+            s[right] = temp;
+            left++;
+            right--;
+        }
+    }
+}
+
+Two pointers: Swap ends → move inward. Meet in middle = done.
+
+#Step-by-Step Logic
+Pointers: left=0, right=n-1
+While left < right:
+Swap s[left] ↔ s[right]
+left++, right--
+Terminate: left >= right (crossed/palindrome)
+Trace: ["h","e","l","l","o"]
+text
+left=0,right=4: swap h↔o → ["o","e","l","l","h"]
+left=1,right=3: swap e↔l → ["o","l","l","e","h"] ✓
+left=2,right=2: left>=right → done
+
+#Thought Process
+Two-pointer classic: Converge from ends. O(n/2) = O(n) swaps.
+Why left < right: Prevents double-swap on middle element (odd length).
+In-place requirement: Single temp variable = O(1) space.
+Alternatives: Stack O(n) space, recursion O(n) stack → violate constraints.
+
+#Edge Cases
+Empty: [] → while false, correct
+Single char: ["a"] → left=0,right=0 → skip, correct
+Even length: ["a","b"] → swap once ✓
+Odd length: ["a","b","c"] → middle b untouched ✓
+Palindrome: ["a","b","b","a"] → swaps cancel ✓
