@@ -1,0 +1,73 @@
+Problem:- Valid Palindrome
+
+A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.
+
+Given a string s, return true if it is a palindrome, or false otherwise.
+Example 1:
+
+Input: s = "A man, a plan, a canal: Panama"
+Output: true
+Explanation: "amanaplanacanalpanama" is a palindrome.
+
+Solutions:
+
+Valid Palindrome checks if cleaned string (lowercase, alphanumeric only) reads same forward/backward using two pointers.[conversation_history]
+
+#Java Implementation (Two Pointers)
+
+class Solution {
+    public boolean isPalindrome(String s) {
+        int left = 0;
+        int right = s.length() - 1;
+        
+        while (left < right) {
+            // Skip non-alphanumeric left
+            while (left < right && !Character.isLetterOrDigit(s.charAt(left))) {
+                left++;
+            }
+            // Skip non-alphanumeric right  
+            while (left < right && !Character.isLetterOrDigit(s.charAt(right))) {
+                right--;
+            }
+            // Compare lowercase
+            if (Character.toLowerCase(s.charAt(left)) != 
+                Character.toLowerCase(s.charAt(right))) {
+                return false;
+            }
+            left++;
+            right--;
+        }
+        return true;
+    }
+}
+
+Two pointers: Clean on-the-fly, compare valid chars only.
+
+#Step-by-Step Logic
+Pointers: left=0, right=n-1
+While left < right:
+Skip non-alphanumeric from both ends
+Compare lowercase chars
+If mismatch → false
+Move inward
+Cross/meet: true
+Trace: "A man, a plan, a canal: Panama"
+text
+Clean view: amanaplanacanalpanama
+left→a, right→a ✓
+left→m, right→m ✓
+... continues matching ✓
+
+#Thought Process
+Clean first: Remove non-alphanum + lowercase → O(n) space + reverse check.
+Two-pointer genius: Skip junk in-place! No preprocessing needed.
+Why left < right: Prevents double-check middle char.
+Time: O(n), Space: O(1)
+
+#Edge Cases
+Empty: "" → true (vacuous)
+Single char: "a" → true
+All junk: ".,!@#" → true (no alphanum)
+Numbers: "12321" → true
+Mixed case: "RaCeCaR" → true
+Odd length: "madam" → true
