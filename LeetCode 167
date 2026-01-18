@@ -1,0 +1,74 @@
+Problem:-Two Sum II - Input Array Is Sorted
+
+Given a 1-indexed array of integers numbers that is already sorted in non-decreasing order, find two numbers such that they add up to a specific target number. Let these two numbers be numbers[index1] and numbers[index2] where 1 <= index1 < index2 <= numbers.length.
+
+Return the indices of the two numbers, index1 and index2, added by one as an integer array [index1, index2] of length 2.
+
+The tests are generated such that there is exactly one solution. You may not use the same element twice.
+
+Your solution must use only constant extra space.
+
+Example 1:
+
+Input: numbers = [2,7,11,15], target = 9
+Output: [1,2]
+Explanation: The sum of 2 and 7 is 9. Therefore, index1 = 1, index2 = 2. We return [1, 2].
+
+Solutions:-
+
+LeetCode 167: Two Sum II - Input Array Is Sorted finds two distinct indices (1-based) in sorted array summing to target. O(n) two pointers, O(1) space.[conversation_history]
+
+#Java Implementation (Two Pointers)
+
+class Solution {
+    public int[] twoSum(int[] numbers, int target) {
+        int left = 0;
+        int right = numbers.length - 1;
+        
+        while (left < right) {
+            int sum = numbers[left] + numbers[right];
+            
+            if (sum == target) {
+                return new int[]{left + 1, right + 1};  // 1-based
+            } else if (sum < target) {
+                left++;  // Need larger sum
+            } else {
+                right--; // Need smaller sum
+            }
+        }
+        
+        // Guaranteed solution exists
+        return new int[]{};
+    }
+}
+
+Sorted two pointers: Left+right → converge to target.
+
+#Step-by-Step Logic
+Pointers: left=0, right=n-1
+While left < right:
+sum = numbers[left] + numbers[right]
+sum == target → return 1-based indices
+sum < target → left++ (array sorted ↑)
+sum > target → right--
+Guaranteed: Loop finds solution
+Trace: [2,7,11,15], target=9
+
+left=0(2),right=3(15): 17>9 → right=2
+left=0(2),right=2(11): 13>9 → right=1  
+left=0(2),right=1(7):  9=9 ✓ → [1,2]
+
+#Thought Process
+Sorted advantage: Sum too small → move left (bigger nums ahead)
+Sum too big: Move right (smaller nums behind)
+Two pointers: O(n) vs HashMap O(n) space
+1-based indices: left+1, right+1
+Why left < right: Prevents same element twice.
+Time: O(n), Space: O(1)
+
+#Edge Cases
+Length 2: [1,2], target=3 → [1,2]
+Target min: numbers[0]+numbers[1]
+Target max: numbers[n-2]+numbers[n-1]
+Duplicates: [1,1,2], target=2 → [1,2] ✓
+Plateaus: [1,2,2,3], target=4 → [2,3] ✓
