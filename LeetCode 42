@@ -1,0 +1,70 @@
+Proble:-Trapping Rain Water
+
+Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.
+
+Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]
+Output: 6
+Explanation: The above elevation map (black section) is represented by array [0,1,0,2,1,0,1,3,2,1,2,1]. In this case, 6 units of rain water (blue section) are being trapped.
+
+#Solutions:-
+
+LeetCode 42: Trapping Rain Water computes total water trapped between elevation bars. Two pointers O(n) space O(1) solution.[conversation_history]
+
+#Java Implementation (Two Pointers)
+
+class Solution {
+    public int trap(int[] height) {
+        int left = 0;
+        int right = height.length - 1;
+        int leftMax = 0;
+        int rightMax = 0;
+        int water = 0;
+        
+        while (left < right) {
+            // Update left max
+            leftMax = Math.max(leftMax, height[left]);
+            rightMax = Math.max(rightMax, height[right]);
+            
+            // Water determined by smaller boundary
+            if (leftMax <= rightMax) {
+                water += leftMax - height[left];
+                left++;
+            } else {
+                water += rightMax - height[right];
+                right--;
+            }
+        }
+        return water;
+    }
+}
+
+Dynamic max tracking: Process side with known smaller boundary.
+
+#Step-by-Step Logic
+Pointers: left=0, right=n-1
+Max heights: leftMax, rightMax
+While left < right:
+Update current maxes
+Smaller boundary side: Add boundary - height[i]
+Move that pointer
+Key: Water at i = min(leftMax, rightMax) - height[i]
+Trace: [0,1,0,2,1,0,1,3,2,1,2,1]
+text
+leftMax=1,rightMax=1: water+=1-0=1, left=2
+leftMax=2,rightMax=3: water+=2-0=3 total, left=3  
+... final water=6 ✓
+
+#Thought Process
+Brute O(n²): For each i, find left/right max → TLE.
+Precompute O(n): LeftMax[i], RightMax[i] arrays → O(n) space.
+Two pointers genius:
+text
+Smaller boundary = water limit → process that side first!
+Dynamic max tracking eliminates arrays → O(1) space!
+Why move smaller: Guarantees valid boundary for water calculation.
+
+#Edge Cases
+n<3: [1,0,1] → 1; [1] → 0
+No water: [1,2,3] → 0 (always rising)
+All same: [2,2,2] → 0
+Trap everywhere: [3,0,0,3] → 6
