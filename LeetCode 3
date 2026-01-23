@@ -1,0 +1,79 @@
+Problem: Longest Substring Without Repeating Characters
+
+Given a string s, find the length of the longest substring without duplicate characters.
+
+Example 1:
+
+Input: s = "abcabcbb"
+Output: 3
+Explanation: The answer is "abc", with a length of 3. Note that "bca" and "cab" are also correct answers.
+
+Solutions:-
+
+Longest Substring Without Repeating Characters finds max length of substring with unique chars using sliding window + HashMap.[conversation_history]
+
+#Java Implementation (Sliding Window)
+
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        Map<Character, Integer> map = new HashMap<>();
+        int maxLen = 0;
+        int left = 0;
+        
+        for (int right = 0; right < s.length(); right++) {
+            char c = s.charAt(right);
+            
+            // Shrink window if duplicate found
+            if (map.containsKey(c)) {
+                left = Math.max(left, map.get(c) + 1);
+            }
+            
+            map.put(c, right);
+            maxLen = Math.max(maxLen, right - left + 1);
+        }
+        
+        return maxLen;
+    }
+}
+
+Sliding window: Expand right, shrink left on duplicates.
+
+#Step-by-Step Logic
+Pointers: left=0 (window start), right=0 (window end)
+HashMap: char → last index
+For each right:
+If c seen: left = max(left, lastIndex+1)
+Update map[c] = right
+maxLen = max(maxLen, right-left+1)
+Result: maxLen
+Trace: "abcabcbb"
+
+text
+r=0 a: map={}, left=0, len=1
+r=1 b: map={a:0}, left=0, len=2  
+r=2 c: map={a:0,b:1}, left=0, len=3 ✓
+r=3 a: map={a:0}, left=1, len=3 (c-a-b)
+r=4 b: map={a:3,b:1}, left=4, len=1 (b)
+r=5 c: map={a:3,b:4,c:2}, left=4, len=2 (b-c)
+r=6 b: map={a:3,b:4}, left=5, len=2 (c-b)
+r=7 b: map={a:3,b:6}, left=7, len=1 (b)
+Max=3 ✓
+
+#Thought Process
+Brute O(n²): Check all substrings → TLE.
+Sliding window insight:
+
+text
+Valid window → expand right
+Duplicate → shrink left to last occurrence + 1
+HashMap tracks LAST position only
+Why left = max(left, map.get(c)+1): Ensures no earlier chars missed.
+
+Time: O(n), Space: O(min(n,m)) where m=charset size.
+
+#Edge Cases
+Empty: "" → 0
+Single: "a" → 1
+All unique: "abcde" → 5
+All duplicates: "aaaaa" → 1
+Repeating pattern: "abcabc" → 3
