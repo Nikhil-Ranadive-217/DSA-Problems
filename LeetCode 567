@@ -1,0 +1,76 @@
+Problem:-Permutation in String
+Given two strings s1 and s2, return true if s2 contains a permutation of s1, or false otherwise.
+
+In other words, return true if one of s1's permutations is the substring of s2.
+
+Example 1:
+
+Input: s1 = "ab", s2 = "eidbaooo"
+Output: true
+Explanation: s2 contains one permutation of s1 ("ba").
+
+Solutions:-
+
+Permutation in String checks if s2 contains any permutation of s1 as contiguous substring. Sliding window + char count matching.
+
+Java Implementation (Sliding Window)
+java
+class Solution {
+    public boolean checkInclusion(String s1, String s2) {
+        if (s1.length() > s2.length()) return false;
+        
+        int[] count = new int[26];
+        // Initial window s1
+        for (char c : s1.toCharArray()) {
+            count[c - 'a']++;
+        }
+        
+        // Initial window s2
+        int matched = 0;
+        for (int i = 0; i < s1.length(); i++) {
+            char c = s2.charAt(i);
+            count[c - 'a']--;
+            if (count[c - 'a'] >= 0) matched++;
+        }
+        
+        // Slide window
+        for (int i = s1.length(); i < s2.length(); i++) {
+            char oldC = s2.charAt(i - s1.length());
+            char newC = s2.charAt(i);
+            
+            // Remove old
+            if (count[oldC - 'a']++ == -1) matched--;
+            
+            // Add new
+            count[newC - 'a']--;
+            if (count[newC - 'a'] >= 0) matched++;
+            
+            if (matched == s1.length()) return true;
+        }
+        
+        return matched == s1.length();
+    }
+}
+
+Fixed window: Size s1.length(), track matching chars.
+
+#Step-by-Step Logic
+Count s1: count[c]++
+Initial s2 window: Slide s1.length() chars, track matched
+#Slide window:
+Remove oldC: if was matching (count==-1), matched--
+Add newC: if matches target (count>=0), matched++
+matched == s1.length() → permutation found
+
+#Thought Process
+Brute: Check every s2 substring → O(n*m!) TLE.
+Sliding window: Fixed size s1.length(), permutation iff char counts match.
+Optimization: Track matched count instead of full equality check each time.
+Why count[oldC]++ == -1: Was matching (count=-1 before ++).
+Time: O(n), Space: O(1)
+
+#Edge Cases
+s1 longer: Immediate false
+s1 empty: Edge case true (vacuous)
+Exact match: Works
+s1 all same: "aaa" in "abaaa" ✓
