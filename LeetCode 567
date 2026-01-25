@@ -14,41 +14,46 @@ Solutions:-
 Permutation in String checks if s2 contains any permutation of s1 as contiguous substring. Sliding window + char count matching.
 
 Java Implementation (Sliding Window)
-java
 class Solution {
     public boolean checkInclusion(String s1, String s2) {
         if (s1.length() > s2.length()) return false;
         
         int[] count = new int[26];
-        // Initial window s1
+        
+        // Count s1 characters
         for (char c : s1.toCharArray()) {
             count[c - 'a']++;
         }
         
-        // Initial window s2
-        int matched = 0;
-        for (int i = 0; i < s1.length(); i++) {
-            char c = s2.charAt(i);
-            count[c - 'a']--;
-            if (count[c - 'a'] >= 0) matched++;
+        int matches = 0;
+        
+        // Slide fixed-size window over s2
+        for (int i = 0; i < s2.length(); i++) {
+            // Add new character (right end)
+            char rightChar = s2.charAt(i);
+            count[rightChar - 'a']--;
+            if (count[rightChar - 'a'] >= 0) {
+                matches++;
+            }
+            
+            // Remove old character (left end) - only if window full size
+            if (i >= s1.length()) {
+                char leftChar = s2.charAt(i - s1.length());
+                if (count[leftChar - 'a']++ >= 0) {
+                    matches--;
+                }
+            }
+            
+            // Check if window matches s1
+            if (matches == s1.length()) {
+                return true;
+            }
         }
         
-        // Slide window
-        for (int i = s1.length(); i < s2.length(); i++) {
-            char oldC = s2.charAt(i - s1.length());
-            char newC = s2.charAt(i);
-            
-            // Remove old
-            if (count[oldC - 'a']++ == -1) matched--;
-            
-            // Add new
-            count[newC - 'a']--;
-            if (count[newC - 'a'] >= 0) matched++;
-            
-            if (matched == s1.length()) return true;
-        }
-        
-        return matched == s1.length();
+        return false;
+    }
+}
+
     }
 }
 
