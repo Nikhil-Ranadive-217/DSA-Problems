@@ -1,0 +1,72 @@
+Problem:- Minimum Size Subarray Sum
+
+Given an array of positive integers nums and a positive integer target, return the minimal length of a subarray whose sum is greater than or equal to target. If there is no such subarray, return 0 instead.
+
+Example 1:
+
+Input: target = 7, nums = [2,3,1,2,4,3]
+Output: 2
+Explanation: The subarray [4,3] has the minimal length under the problem constraint.
+
+Solutions:-
+
+LeetCode 209: Minimum Size Subarray Sum finds shortest contiguous subarray with sum ≥ target using sliding window (positive integers only).
+​
+#Java Implementation (Sliding Window)
+
+class Solution {
+    public int minSubArrayLen(int target, int[] nums) {
+        int minLen = Integer.MAX_VALUE;
+        int sum = 0;
+        int left = 0;
+        
+        for (int right = 0; right < nums.length; right++) {
+            sum += nums[right];
+            
+            // Shrink while valid
+            while (sum >= target) {
+                minLen = Math.min(minLen, right - left + 1);
+                sum -= nums[left];
+                left++;
+            }
+        }
+        
+        return minLen == Integer.MAX_VALUE ? 0 : minLen;
+    }
+}
+
+Expand → Shrink: Grow window until valid, then minimize.
+
+#Step-by-Step Logic
+right expands: sum += nums[right]
+While sum >= target:
+Update minLen = right-left+1
+rink sum -= nums[left++]
+Result: minLen or 0 if no solution
+Trace: target=7, [2,3,1,2,4,3]
+
+text
+r=0: sum=2
+r=1: sum=5  
+r=2: sum=6
+r=3: sum=8 ≥7 → minLen=4, sum=6, left=1
+r=4: sum=10 ≥7 → minLen=4, sum=7, left=2  
+     sum=11 ≥7 → minLen=3, sum=9, left=3
+     sum=13 ≥7 → minLen=2 ✓, sum=11, left=4
+r=5: sum=14 ≥7 → minLen=2, sum=10, left=5
+#Thought Process
+Key insight: Positive integers → sum monotonically increases
+
+text
+Valid window → try shrink left (might still be valid)
+Invalid → must expand right
+Brute O(n²): All subarrays → TLE
+Sliding window: O(n) - each element added/removed once
+
+Why while shrink: Find smallest valid window at each step
+
+#Edge Cases
+No solution: [1,2,3], target=100 → 0
+Exact target: [2,3,1,2], target=7 → 4
+Single element: [7], target=7 → 1
+Target=1: Smallest single element ≥1
