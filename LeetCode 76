@@ -1,0 +1,95 @@
+Problem:-Minimum Window Substring
+Given two strings s and t of lengths m and n respectively, return the minimum window substring of s such that every character in t (including duplicates) is included in the window. If there is no such substring, return the empty string "".
+
+The testcases will be generated such that the answer is unique.
+
+Example 1:
+
+Input: s = "ADOBECODEBANC", t = "ABC"
+Output: "BANC"
+Explanation: The minimum window substring "BANC" includes 'A', 'B', and 'C' from string t.
+
+Solutions:-
+
+LeetCode 76: Minimum Window Substring finds shortest substring of s containing all chars of t (with duplicates). Sliding window + valid count tracking.
+
+#Java Implementation (Sliding Window)
+
+class Solution {
+    public String minWindow(String s, String t) {
+        if (s.length() < t.length()) return "";
+        
+        // Count required chars from t
+        int[] countT = new int[128];
+        for (char c : t.toCharArray()) {
+            countT[c]++;
+        }
+        
+        int required = t.length();  // Total chars needed
+        int formed = 0;             // Valid chars in window
+        int left = 0, minLen = Integer.MAX_VALUE;
+        String result = "";
+        
+        for (int right = 0; right < s.length(); right++) {
+            char c = s.charAt(right);
+            
+            // Valid char added
+            if (countT[c] > 0) {
+                formed++;
+            }
+            countT[c]--;
+            
+            // Shrink while valid
+            while (formed == required && left <= right) {
+                int currLen = right - left + 1;
+                if (currLen < minLen) {
+                    minLen = currLen;
+                    result = s.substring(left, right + 1);
+                }
+                
+                char leftChar = s.charAt(left);
+                countT[leftChar]++;
+                if (countT[leftChar] > 0) {
+                    formed--;
+                }
+                left++;
+            }
+        }
+        
+        return result;
+    }
+}
+
+#Step-by-Step Logic
+Count t: countT[c] = required frequency
+required = t.length(): Total chars needed
+Expand right:
+If countT[c] > 0 → useful char → formed++
+countT[c]--
+While formed == required:
+Update min window
+Remove left, update formed if needed
+Result: Smallest substring found
+Trace: s="ADOBECODEBANC", t="ABC"
+
+text
+right=3 B: formed=1
+right=4 A: formed=2  
+right=7 C: formed=3==3 → window "BANC" ✓ minLen=4
+Shrink left → continue...
+
+#Thought Process
+Insight: Track "useful chars remaining" (formed) not frequencies
+
+text
+countT[c] > 0 → "needed char"
+countT[c]-- → consume one needed
+formed == required → ALL needed chars present!
+Why shrink: Find minimal valid window
+Time: O(|s| + |t|), Space: O(1)
+
+#Edge Cases
+No solution: "a", "b" → ""
+s shorter: Immediate ""
+t empty: Edge case ""
+Exact match: "abc", "abc" → "abc"
