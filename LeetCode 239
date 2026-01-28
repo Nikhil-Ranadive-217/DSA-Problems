@@ -1,0 +1,95 @@
+Problem:- Sliding Window Maximum
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+You are given an array of integers nums, there is a sliding window of size k which is moving from the very left of the array to the very right. You can only see the k numbers in the window. Each time the sliding window moves right by one position.
+
+Return the max sliding window.
+
+ 
+
+Example 1:
+
+Input: nums = [1,3,-1,-3,5,3,6,7], k = 3
+Output: [3,3,5,5,6,7]
+Explanation: 
+Window position                Max
+---------------               -----
+[1  3  -1] -3  5  3  6  7       3
+ 1 [3  -1  -3] 5  3  6  7       3
+ 1  3 [-1  -3  5] 3  6  7       5
+ 1  3  -1 [-3  5  3] 6  7       5
+ 1  3  -1  -3 [5  3  6] 7       6
+ 1  3  -1  -3  5 [3  6  7]      7
+
+Solutions:-
+
+LeetCode 239: Sliding Window Maximum computes max for every contiguous window of size k. Deque monotonic queue O(n) solution.
+
+#Java Implementation (Monotonic Deque)
+
+class Solution {
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        Deque<Integer> dq = new ArrayDeque<>();  // Indices, decreasing order
+        int[] result = new int[nums.length - k + 1];
+        
+        for (int i = 0; i < nums.length; i++) {
+            // Remove indices out of current window
+            while (!dq.isEmpty() && dq.peekFirst() <= i - k) {
+                dq.pollFirst();
+            }
+            
+            // Remove indices with smaller values (won't be max)
+            while (!dq.isEmpty() && nums[dq.peekLast()] < nums[i]) {
+                dq.pollLast();
+            }
+            
+            dq.offerLast(i);
+            
+            // First window result
+            if (i >= k - 1) {
+                result[i - k + 1] = nums[dq.peekFirst()];
+            }
+        }
+        
+        return result;
+    }
+}
+
+Deque: Stores indices in decreasing value order. Front = max.
+
+#Step-by-Step Logic
+Deque: Indices of useful candidates (decreasing nums values)
+For each i:
+Clean front: Remove out-of-window (i-k)
+Clean back: Remove smaller values (nums[dq.back] < nums[i])
+Add i: dq.offerLast(i)
+i ≥ k-1: result[i-k+1] = nums[dq.peekFirst()]
+Result: Max for each window
+Trace: [1,3,-1,-3,5,3,6,7], k=3
+
+text
+i=0: dq=[0]
+i=1: remove 1<3, dq=[1] (3)
+i=2: dq=[1,2], result[0]=3
+i=3: remove i=1(3> -3), dq=[2,3]
+i=4: remove 5>-1,-3, dq=[4] (5), result[2]=5
+... Final: [3,3,5,5,6,7]
+
+#Thought Process
+Brute O(nk): Max each window → TLE.
+Monotonic deque genius:
+
+text
+Maintain decreasing candidates
+Front = current max (O(1) access)
+Smaller values can't become max later → discard!
+Each index: Added/removed once → O(n)
+
+#Edge Cases
+k=1: Each element is max
+k=n: Single window max
+All decreasing: Deque keeps all until expire
+Duplicates: Handle equal values
