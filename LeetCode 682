@@ -1,0 +1,109 @@
+Problem:- Baseball Game
+You are keeping the scores for a baseball game with strange rules. At the beginning of the game, you start with an empty record.
+
+You are given a list of strings operations, where operations[i] is the ith operation you must apply to the record and is one of the following:
+
+An integer x.
+Record a new score of x.
+'+'.
+Record a new score that is the sum of the previous two scores.
+'D'.
+Record a new score that is the double of the previous score.
+'C'.
+Invalidate the previous score, removing it from the record.
+Return the sum of all the scores on the record after applying all the operations.
+
+The test cases are generated such that the answer and all intermediate calculations fit in a 32-bit integer and that all operations are valid.
+
+ 
+Example 1:
+
+Input: ops = ["5","2","C","D","+"]
+Output: 30
+Explanation:
+"5" - Add 5 to the record, record is now [5].
+"2" - Add 2 to the record, record is now [5, 2].
+"C" - Invalidate and remove the previous score, record is now [5].
+"D" - Add 2 * 5 = 10 to the record, record is now [5, 10].
+"+" - Add 5 + 10 = 15 to the record, record is now [5, 10, 15].
+The total sum is 5 + 10 + 15 = 30.
+
+Solutions:- 
+
+LeetCode 682: Baseball Game simulates strange scoring rules using stack/array + running total. O(n) simple iteration.
+
+#Java Implementation (Array + Running Sum)
+
+class Solution {
+    public int calPoints(String[] ops) {
+        int[] record = new int[ops.length];
+        int top = -1;  // Stack top index
+        int total = 0;
+        
+        for (String op : ops) {
+            switch (op) {
+                case "C":
+                    if (top >= 0) {
+                        total -= record[top];
+                        top--;
+                    }
+                    break;
+                case "D":
+                    if (top >= 0) {
+                        int doubled = record[top] * 2;
+                        record[++top] = doubled;
+                        total += doubled;
+                    }
+                    break;
+                case "+":
+                    if (top >= 1) {
+                        int sum = record[top] + record[top - 1];
+                        record[++top] = sum;
+                        total += sum;
+                    }
+                    break;
+                default:  // Integer score
+                    int score = Integer.parseInt(op);
+                    record[++top] = score;
+                    total += score;
+            }
+        }
+        
+        return total;
+    }
+}
+
+Array as stack: top index simulates stack operations.
+
+#Step-by-Step Logic
+Array record: Stores valid scores
+top index: Current stack top (-1 = empty)
+For each operation:
+"C": Remove top, total -= record[top--]
+"D": Double top, total += record[top] * 2
+"+": Sum top 2, total += record[top] + record[top-1]
+Integer: Add score, total += score
+Result: total
+Trace: ["5","2","C","D","+"]
+
+text
+"5": record[0]=5, top=0, total=5
+"2": record[1]=2, top=1, total=7  
+"C": total-=2=5, top=0
+"D": record[1]=10, top=1, total=15
+"+": record[2]=15, top=2, total=30 ✓
+
+#Thought Process
+Stack classic: Last-in-first-out perfect for C, D, +
+Array vs Deque: Array faster, pre-allocated size known
+Running total: Update on add/remove → O(1) final sum
+Switch efficient: Clean operation dispatch
+
+Time: O(n), Space: O(n)
+
+#Edge Cases
+Empty: [] → 0
+Single: ["1"] → 1
+All C: ["1","C"] → 0
+C on empty: Skip (guaranteed valid)
+Large numbers: 32-bit safe (per constraints)
