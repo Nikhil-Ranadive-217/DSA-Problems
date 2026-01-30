@@ -1,0 +1,85 @@
+Problem:-Valid Parentheses
+
+Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+
+An input string is valid if:
+Open brackets must be closed by the same type of brackets.
+Open brackets must be closed in the correct order.
+Every close bracket has a corresponding open bracket of the same type.
+ 
+Example 1:
+Input: s = "()"
+Output: true
+
+Solutions:-
+
+LeetCode 20: Valid Parentheses validates matching brackets with correct order using stack. Classic stack problem.
+
+#Java Implementation (Stack)
+
+class Solution {
+    public boolean isValid(String s) {
+        Stack<Character> stack = new Stack<>();
+        Map<Character, Character> map = new HashMap<>();
+        map.put(')', '(');
+        map.put('}', '{');
+        map.put(']', '[');
+        
+        for (char c : s.toCharArray()) {
+            // Closing bracket
+            if (map.containsKey(c)) {
+                if (stack.isEmpty() || stack.pop() != map.get(c)) {
+                    return false;
+                }
+            }
+            // Opening bracket
+            else {
+                stack.push(c);
+            }
+        }
+        
+        return stack.isEmpty();
+    }
+}
+
+Stack matching: Push opens, pop on matching close.
+
+#Step-by-Step Logic
+HashMap: close → expected open
+For each char:
+Closing bracket: map.containsKey(c)
+Stack empty → invalid
+Top ≠ expected open → invalid
+Else pop ✓
+Opening bracket: push(c)
+Final: stack.empty() → valid
+Trace: "({[]})"
+
+text
+'(': push → stack=['(']
+'{': push → ['(','{']
+'[': push → ['(','{','[']
+']': pop '[' ✓ → ['(','{']
+'}': pop '{' ✓ → ['(']  
+')': pop '(' ✓ → []
+Empty ✓ → true
+
+#Thought Process
+Stack perfect fit: LIFO matches nested brackets
+
+text
+()[]{} → nested structure
+Two-pass reverse invalid → stack natural
+HashMap efficient: O(1) close→open lookup vs multiple ifs
+Single pass: O(n) time, O(n) space
+
+#Alternatives:
+Counter fails on order: "([)]" → wrong
+Two pointers impossible (random order)
+
+#Edge Cases
+Empty: "" → true ✓
+Single: "(" → false (leftover)
+Odd length: "(()" → false
+Wrong order: "([)]" → false
+Interleaved: ")(" → false
