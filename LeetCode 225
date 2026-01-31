@@ -1,0 +1,96 @@
+Problem:- Implement Stack using Queues
+
+Implement a last-in-first-out (LIFO) stack using only two queues. The implemented stack should support all the functions of a normal stack (push, top, pop, and empty).
+
+Implement the MyStack class:
+void push(int x) Pushes element x to the top of the stack.
+int pop() Removes the element on the top of the stack and returns it.
+int top() Returns the element on the top of the stack.
+boolean empty() Returns true if the stack is empty, false otherwise.
+
+Notes:
+You must use only standard operations of a queue, which means that only push to back, peek/pop from front, size and is empty operations are valid.
+Depending on your language, the queue may not be supported natively. You may simulate a queue using a list or deque (double-ended queue) as long as you use only a queue's standard operations.
+ 
+
+Example 1:
+Input
+["MyStack", "push", "push", "top", "pop", "empty"]
+[[], [1], [2], [], [], []]
+Output
+[null, null, null, 2, 2, false]
+
+Solutions:- 
+
+Implement Stack using Queues simulates LIFO stack using FIFO queues. Two approaches: swap (amortized O(1)) or rotate (strict O(1) push).
+
+#Java Implementation (Queue Swap - Amortized O(1))
+
+class MyStack {
+    private Queue<Integer> q1;
+    private Queue<Integer> q2;
+    
+    public MyStack() {
+        q1 = new LinkedList<>();
+        q2 = new LinkedList<>();
+    }
+    
+    public void push(int x) {
+        // Push to q2, swap q1↔q2
+        q2.offer(x);
+        while (!q1.isEmpty()) {
+            q2.offer(q1.poll());
+        }
+        Queue<Integer> temp = q1;
+        q1 = q2;
+        q2 = temp;
+    }
+    
+    public int pop() {
+        return q1.poll();
+    }
+    
+    public int top() {
+        return q1.peek();
+    }
+    
+    public boolean empty() {
+        return q1.isEmpty();
+    }
+}
+
+#Step-by-Step Logic
+Strategy: Make q1 always have newest on front (stack top)
+push(x):
+Add x to q2
+Move all q1 → q2 (preserving order)
+Swap q1 ↔ q2 → q1 now has newest front
+pop/top: q1.poll()/peek() → O(1)
+empty: q1.isEmpty() → O(1)
+Trace: push(1), push(2)
+
+text
+push(1): q1=[1], q2=[]
+push(2): q2=[2], move q1→q2 → q2=[2,1], swap → q1=[2,1]
+top=2 ✓, pop → q1=[1]
+
+#Thought Process
+Queue FIFO → Stack LIFO challenge:
+
+text
+Queue: back→front FIFO
+Stack: top→bottom LIFO  
+Solution: Rearrange so newest = front
+
+#Two approaches:
+Swap (shown): O(n) push, O(1) pop/top → amortized O(1)
+Rotate: O(1) push, O(n) pop → same amortized
+Swap wins: pop/top most frequent in practice
+Time: Amortized O(1), Space: O(n)
+
+#Edge Cases
+Empty: pop/top on empty → undefined (per constraints)
+Single element: Works ✓
+Multiple pushes: Order preserved ✓
+
+
