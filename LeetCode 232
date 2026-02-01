@@ -1,0 +1,107 @@
+Problem:- Implement Queue using Stacks
+
+Implement a first in first out (FIFO) queue using only two stacks. The implemented queue should support all the functions of a normal queue (push, peek, pop, and empty).
+
+Implement the MyQueue class:
+
+void push(int x) Pushes element x to the back of the queue.
+int pop() Removes the element from the front of the queue and returns it.
+int peek() Returns the element at the front of the queue.
+boolean empty() Returns true if the queue is empty, false otherwise.
+
+Notes:
+You must use only standard operations of a stack, which means only push to top, peek/pop from top, size, and is empty operations are valid.
+Depending on your language, the stack may not be supported natively. You may simulate a stack using a list or deque (double-ended queue) as long as you use only a stack's standard operations.
+ 
+Example 1:
+
+Input
+["MyQueue", "push", "push", "peek", "pop", "empty"]
+[[], [1], [2], [], [], []]
+Output
+[null, null, null, 1, 1, false]
+
+Solutions:-
+
+Implement Queue using Stacks simulates FIFO queue using LIFO stacks. Two-stack approach: input + output stacks.
+
+#Java Implementation (Two Stacks)
+
+class MyQueue {
+    Stack<Integer> input;
+    Stack<Integer> output;
+    
+    public MyQueue() {
+        input = new Stack<>();
+        output = new Stack<>();
+    }
+    
+    public void push(int x) {
+        input.push(x);  // Always to input stack
+    }
+    
+    public int pop() {
+        pour();         // Ensure output ready
+        return output.pop();
+    }
+    
+    public int peek() {
+        pour();         // Ensure output ready  
+        return output.peek();
+    }
+    
+    public boolean empty() {
+        return input.isEmpty() && output.isEmpty();
+    }
+    
+    private void pour() {
+        // Move input → output (reverse order)
+        if (output.isEmpty()) {
+            while (!input.isEmpty()) {
+                output.push(input.pop());
+            }
+        }
+    }
+}
+
+Input stack → Output stack (lazy conversion).
+
+#Step-by-Step Logic
+push(x): Always input.push(x) → O(1)
+pour(): Only when needed (output.empty()):
+Empty input → output (reverses order → FIFO)
+pop/peek: output.pop()/peek() → O(1)
+empty: Both stacks empty
+Trace: push(1), push(2), peek()
+
+text
+push(1): input=[1]
+push(2): input=[1,2] (2 on top)
+peek(): pour() → output=[2,1] (1 on top) ✓ peek=1
+
+#Thought Process
+LIFO → FIFO challenge:
+
+text
+Stack: push/pop TOP
+Queue: push BACK, pop FRONT
+
+#Solution: input stack + output stack (reverse on demand)
+Lazy conversion genius:
+
+text
+Don't pour until pop/peek needed
+Amortized O(1): each element poured once
+
+#Why two stacks:
+
+text
+1 stack: can't access "front" efficiently
+2 stacks: input collects, output serves FIFO
+Time: Amortized O(1), Space: O(n)
+
+#Edge Cases
+Empty: pop/peek → pour() handles
+Single element: Works ✓
+Multiple pushes: FIFO order preserved ✓
+Mixed operations: Lazy pour handles perfectly
