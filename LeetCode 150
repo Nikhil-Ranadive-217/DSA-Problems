@@ -1,0 +1,91 @@
+Proble:- Evaluate Reverse Polish Notation
+
+You are given an array of strings tokens that represents an arithmetic expression in a Reverse Polish Notation.
+
+Evaluate the expression. Return an integer that represents the value of the expression.
+
+Note that:
+The valid operators are '+', '-', '*', and '/'.
+Each operand may be an integer or another expression.
+The division between two integers always truncates toward zero.
+There will not be any division by zero.
+The input represents a valid arithmetic expression in a reverse polish notation.
+The answer and all the intermediate calculations can be represented in a 32-bit integer.
+ 
+Example 1:
+Input: tokens = ["2","1","+","3","*"]
+Output: 9
+Explanation: ((2 + 1) * 3) = 9
+
+Solutions:-
+
+Evaluate Reverse Polish Notation evaluates postfix arithmetic expression using stack. Operators follow operands.
+
+#Java Implementation (Stack)
+
+class Solution {
+    public int evalRPN(String[] tokens) {
+        Stack<Integer> stack = new Stack<>();
+        
+        for (String token : tokens) {
+            // Operator: pop 2 operands, apply, push result
+            if (token.length() == 1 && "+-*/".contains(token)) {
+                int b = stack.pop();
+                int a = stack.pop();
+                
+                switch (token) {
+                    case "+": stack.push(a + b); break;
+                    case "-": stack.push(a - b); break;
+                    case "*": stack.push(a * b); break;
+                    case "/": stack.push(a / b); break;  // Truncate toward zero
+                }
+            }
+            // Operand: push to stack
+            else {
+                stack.push(Integer.parseInt(token));
+            }
+        }
+        
+        return stack.pop();
+    }
+}
+
+Postfix stack: Operands → stack, Operator → pop 2 → compute → push 1.
+
+#Step-by-Step Logic
+Stack: Holds operands/intermediate results
+For each token:
+Operand (multi-digit): stack.push(parseInt(token))
+Operator (single char +-*/):
+b = stack.pop(), a = stack.pop()
+Compute a op b, stack.push(result)
+Final: Single result on stack → stack.pop()
+Trace: ["2","1","+","3","*"]
+
+text
+"2": stack=[2]
+"1": stack=[2,1]
+"+": a=2,b=1 → push(3), stack=[3]
+"3": stack=[3,3]  
+"*": a=3,b=3 → push(9), stack=[9] ✓
+
+#Thought Process
+Postfix advantage: No precedence/parentheses needed
+
+text
+Infix:  (2+1)*3 → ambiguous
+Postfix: 2 1 + 3 * → unambiguous stack
+Stack perfect:
+
+text
+Operands accumulate
+Operator consumes 2, produces 1
+Final: single result
+Operator detection: length==1 && "+-*/".contains() efficient
+Time: O(n), Space: O(n)
+
+#Edge Cases
+Single operand: ["5"] → 5 ✓
+Simple op: ["2","1","+"] → 3 ✓
+Division: ["10","3","/"] → 3 (truncate toward zero)
+Negative: ["2","-1","-"] → 3 ✓
