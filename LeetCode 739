@@ -1,0 +1,74 @@
+Problem:- Daily Temperatures
+
+Given an array of integers temperatures represents the daily temperatures, return an array answer such that answer[i] is the number of days you have to wait after the ith day to get a warmer temperature. If there is no future day for which this is possible, keep answer[i] == 0 instead.
+
+Example 1:
+
+Input: temperatures = [73,74,75,71,69,72,76,73]
+Output: [1,1,4,2,1,1,0,0]
+
+Solution :-
+
+Daily Temperatures finds days to wait for warmer temperature using monotonic stack. Next greater element classic.
+
+#Java Implementation (Monotonic Stack)
+
+class Solution {
+    public int[] dailyTemperatures(int[] temperatures) {
+        int[] result = new int[temperatures.length];
+        Stack<Integer> stack = new Stack<>();  // Indices, increasing temps
+        
+        for (int i = 0; i < temperatures.length; i++) {
+            // Pop colder days (found warmer!)
+            while (!stack.isEmpty() && 
+                   temperatures[stack.peek()] < temperatures[i]) {
+                int prevDay = stack.pop();
+                result[prevDay] = i - prevDay;
+            }
+            
+            // Push current day
+            stack.push(i);
+        }
+        
+        return result;
+    }
+}
+
+Monotonic increasing stack: Pop when warmer temp found.
+
+#Step-by-Step Logic
+Stack: Indices of decreasing temperatures (waiting days)
+For each day i:
+While stack.top < current temp: Pop → set result[prev] = i-prev
+Push i (waiting for warmer)
+Unpopped: result[i] = 0 (no warmer day)
+Trace: [73,74,75,71,69,72,76,73]
+
+text
+i=0(73): stack=[0]
+i=1(74): 73<74 → result[0]=1, stack=[1]
+i=2(75): 74<75 → result[1]=1, stack=[2]  
+i=3(71): stack=[2,3]
+i=6(76): 71<76,75<76 → result[3]=3, result[2]=4, stack=[6]
+Final: [1,1,4,2,1,1,0,0] ✓
+
+#Thought Process
+Brute O(n²): Scan forward → TLE.
+
+Monotonic stack genius:
+text
+Stack holds "waiting" days (decreasing temps)
+Warmer day = pop all colder previous days
+Each index pushed/popped ONCE = O(n)
+Right-to-left intuition:
+
+text
+Process right→left: track NEXT greater
+Here: left→right, stack finds next greater
+Time: O(n), Space: O(n)
+
+#Edge Cases
+No warmer: [1,1,1] → [0,0,0]
+Strictly increasing: [1,2,3] → [1,1,0]
+Strictly decreasing: [3,2,1] → [0,0,0]
+Single day: [1] → [0]
