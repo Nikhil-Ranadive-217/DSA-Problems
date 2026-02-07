@@ -1,0 +1,98 @@
+Problem:- Decode String
+
+Given an encoded string, return its decoded string.
+The encoding rule is: k[encoded_string], where the encoded_string inside the square brackets is being repeated exactly k times. Note that k is guaranteed to be a positive integer.
+You may assume that the input string is always valid; there are no extra white spaces, square brackets are well-formed, etc. Furthermore, you may assume that the original data does not contain any digits and that digits are only for those repeat numbers, k. For example, there will not be input like 3a or 2[4].
+The test cases are generated so that the length of the output will never exceed 105.
+
+Example 1:
+
+Input: s = "3[a]2[bc]"
+Output: "aaabcbc"
+
+solutions:-
+
+Decode String decodes nested bracket strings using stack. Classic string parsing with numbers.
+
+#Java Implementation (Stack)
+
+class Solution {
+    public String decodeString(String s) {
+        Stack<Integer> countStack = new Stack<>();
+        Stack<StringBuilder> stringStack = new Stack<>();
+        StringBuilder current = new StringBuilder();
+        int k = 0;
+        
+        for (char ch : s.toCharArray()) {
+            if (Character.isDigit(ch)) {
+                k = k * 10 + (ch - '0');  // Multi-digit numbers
+            }
+            else if (ch == '[') {
+                // Save current state
+                countStack.push(k);
+                stringStack.push(current);
+                current = new StringBuilder();  // New string for inside []
+                k = 0;
+            }
+            else if (ch == ']') {
+                // Repeat and append
+                StringBuilder prev = stringStack.pop();
+                int times = countStack.pop();
+                StringBuilder temp = new StringBuilder();
+                for (int i = 0; i < times; i++) {
+                    temp.append(current);
+                }
+                current = prev.append(temp);
+            }
+            else {  // Letter
+                current.append(ch);
+            }
+        }
+        return current.toString();
+    }
+}
+
+Two stacks: Numbers + strings. Handle nested brackets.
+
+#Step-by-Step Logic
+Two Stacks: countStack (numbers), stringStack (strings before k[)
+
+Process chars:
+Digit: Build k (multi-digit support)
+[: Push k + current string, start new string
+]: Pop k + prev string, repeat, append
+Letter: Add to current
+Trace: "3[a]2[bc]"
+
+text
+3: k=3
+[: push 3,"", current="a"
+a: current="a"  
+]: temp="aaa", current=""+"aaa"="aaa"
+2: k=2
+[: push 2,"aaa", current="b"
+b: current="b"
+c: current="bc"
+]: temp="bcbc", current="aaa"+"bcbc"="aaabcbc" ✓
+
+#Thought Process
+Key insight: Nested structure → Stack
+
+text
+3[2[a]] = 3 × (2 × "a") = "aaaaaa"
+Stack handles nesting naturally
+Multi-digit numbers: k = k*10 + digit
+State saving: Push before entering brackets
+
+Why two stacks:
+
+text
+countStack: 3,2 (nesting levels)
+stringStack: "","aaa" (parent strings)
+Time: O(n × max_k), Space: O(n)
+
+#Edge Cases
+Nested: "3[a2[c]]" → "acacac"
+Multi-digit: "10[a]" → 10×"a"
+Single letter: "a" → "a"
+Deep nesting: "2[3[a]b]" → "aaab aaab"
