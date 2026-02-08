@@ -1,0 +1,88 @@
+Problem:-Largest Rectangle in Histogram
+Hard
+Topics
+premium lock icon
+Companies
+Given an array of integers heights representing the histogram's bar height where the width of each bar is 1, return the area of the largest rectangle in the histogram.
+
+Example 1:
+
+Input: heights = [2,1,5,6,2,3]
+Output: 10
+Explanation: The above is a histogram where width of each bar is 1.
+The largest rectangle is shown in the red area, which has an area = 10 units.
+
+Solutions:-
+
+Largest Rectangle in Histogram finds max rectangle area using monotonic stack. Classic "next smaller element" problem.
+
+#Java Implementation (Monotonic Stack)
+
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        Stack<Integer> stack = new Stack<>();  // Indices, increasing heights
+        int maxArea = 0;
+        int n = heights.length;
+        
+        for (int i = 0; i <= n; i++) {
+            // Use n as sentinel (height=0)
+            int currHeight = (i == n) ? 0 : heights[i];
+            
+            // Pop taller bars, calculate their areas
+            while (!stack.isEmpty() && currHeight <= heights[stack.peek()]) {
+                int height = heights[stack.pop()];
+                int width = stack.isEmpty() ? i : i - stack.peek() - 1;
+                maxArea = Math.max(maxArea, height * width);
+            }
+            stack.push(i);
+        }
+        return maxArea;
+    }
+}
+
+Stack: Indices of increasing heights. Pop finds rectangle boundaries.
+
+#Step-by-Step Logic
+Stack: Indices where heights[stack] is strictly increasing
+Process with sentinel: i <= n (virtual bar height=0 at end)
+When currHeight <= stack.top:
+Pop bar, its right boundary = i
+Left boundary = stack.top() or 0
+area = height × (right - left - 1)
+Result: Max area found
+Trace: [2,1,5,6,2,3]
+
+text
+i=0(2): stack=[0]
+i=1(1): 1<2 → pop0: area=2×1=2, stack=[1]
+i=2(5): stack=[1,2]
+i=3(6): stack=[1,2,3]
+i=4(2): 2<6 → pop3: area=6×1=6
+           2<5 → pop2: area=5×2=10 ✓
+           2>1 → stack=[1,4]
+i=5(3): stack=[1,4,5]
+i=6(0): pop5:3×1=3, pop4:2×3=6, pop1:1×5=5
+Max=10 ✓
+
+#Thought Process
+Brute O(n²): All subarrays → TLE.
+
+Key insight: Each bar popped ONCE → O(n)
+
+text
+Stack finds: left/right smaller bars for each bar
+Rectangle width = distance between smaller neighbors
+Monotonic stack: Maintains increasing heights
+
+text
+Smaller bar → pop all taller bars in between
+Sentinel i==n: Forces final pops.
+
+Time: O(n), Space: O(n)
+
+#Edge Cases
+Single bar: [5] → 5
+All zero: [0,0] → 0
+All same: [2,2,2] → 6
+Strictly increasing: [1,2,3] → 3
+Empty: [] → 0
